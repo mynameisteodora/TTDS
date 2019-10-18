@@ -1,0 +1,9 @@
+q1: Scotland
+q2: Window
+q3: replacing
+q4: condemning
+q5: income OR taxes
+q6: income AND NOT taxes
+q7: "income taxes"
+q8: #10(income, taxes)
+q9: "middle east" AND peace
