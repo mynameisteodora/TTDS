@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="14aec35b-eb2a-44a4-8951-a55d6fe967ea" name="Default Changelist" comment="" />
+    <list default="true" id="14aec35b-eb2a-44a4-8951-a55d6fe967ea" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/cli.results.boolean.new.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cli.results.boolean.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cli.results.index.new.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cli.results.index.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cli.results.ranked.new.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cli.results.ranked.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RunSearch.py" beforeDir="false" afterPath="$PROJECT_DIR$/RunSearch.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +28,11 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="ProjectId" id="1SLWhVfVCgViQZv4XaS1GtxPqZU" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -82,13 +95,28 @@
       <updated>1571343476220</updated>
       <workItem from="1571343478814" duration="2282000" />
       <workItem from="1571352148708" duration="24885000" />
+      <workItem from="1571420498017" duration="3496000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/1_cw$RunSearch.coverage" NAME="RunSearch Coverage Results" MODIFIED="1571416707789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/1_cw$RunSearch.coverage" NAME="RunSearch Coverage Results" MODIFIED="1571426175903" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

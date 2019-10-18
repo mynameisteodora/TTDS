@@ -1,8 +1,10 @@
+import sys
+
 from InvertedIndex import InvertedIndex
-from Term import Term
 import re
 from stemming.porter2 import stem
 import operator
+from os import path
 
 
 class RunSearch:
@@ -289,12 +291,12 @@ class RunSearch:
                     # this is a free word search
                     return self.process_ranked_query(original_term)
 
-    def read_queries_from_file(self, query_file):
+    def read_queries_from_file(self, query_file, output_file):
         with open(query_file, 'r') as f:
             queries = f.read().splitlines()
         f.close()
 
-        with open('./results.ranked.new.txt', 'w+') as f:
+        with open(output_file, 'w+') as f:
             for line in queries:
                 if line[1] != ' ':
                     # two-number query
@@ -316,7 +318,7 @@ class RunSearch:
                         else:
                             r = str("{:0.4f}".format(result[1]))
                             f.write("{0} 0 {1} 0 {2} 0\n".format(query_number, result[0], r))
-                        i+=1
+                        i += 1
                     else:
                         break
 
@@ -324,18 +326,71 @@ class RunSearch:
 
 
 if __name__ == '__main__':
-    r = RunSearch('./collections/trec.5000.xml')
-    # print(r.inverted_index)
-    # r.inverted_index.print_to_file('./index.txt')
-    # print(r.all_documents)
-    # print(r.read_query('#10(income tax)'))
-    # print(r.read_queries_from_file('./queries/queries.lab2.txt'))
 
-    # print("The special query:")
-    # print(r.read_query('NOT "middle east" AND NOT #10(income, taxes)'))
-    #
-    # print("Free text query:")
-    # print(r.read_query('income tax reduction'))
-    #r.inverted_index.print_to_file('./inv_index_lab.txt')
+    print("*"*100)
+    print("\t\t\t Hello! Welcome to your new search engine!")
+    print("*" * 100)
 
-    print(r.read_queries_from_file('./queries/queries.ranked.txt'))
+    print("\nYou can read the README file to learn how to use me.")
+
+    collection_path = input("\nPlease enter the path to the collection you want to use to build the index\nPath: ")
+
+    while not path.exists(collection_path):
+        print("\nFile doesn't exist, try again!\n")
+        collection_path = input("\nPlease enter the path to the collection you want to use to build the index\nPath: ")
+
+    index_print_output_path = input("\nWhere do you want to save your index?\nPath: ")
+
+    print("\nCalculating index...")
+    r = RunSearch(collection_path)
+    r.inverted_index.print_to_file(index_print_output_path)
+    print("Inverted index completed! You can find it here: {0}".format(collection_path))
+
+    loop = True
+    while loop:
+        query_type = input("\n\nDo you want to input queries manually [M] or read them from a file [F]?\n[M]/[F]: ")
+
+        while query_type.lower() not in ['m', 'f']:
+            print("\nNot a valid option, try again!\n")
+            query_type = input("\nDo you want to input queries manually [M] or read them from a file [F]?\n[M]/[F]: ")
+
+        if query_type.lower() == 'm':
+            query = input("\nPlease input your query:\n")
+
+            print("\n\nSearch result (first 1000 matching documents):")
+
+            query_results = r.read_query(query)
+            i = 0
+            for result in query_results:
+                if i < 1000:
+                    if isinstance(result[1], int):
+                        print("{0} 0 {1} 0 {2} 0".format(1, result[0], result[1]))
+                    else:
+                        res = str("{:0.4f}".format(result[1]))
+                        print("{0} 0 {1} 0 {2} 0\n".format(1, result[0], res))
+                    i += 1
+
+        elif query_type.lower() == 'f':
+            query_file_path = input("\nPlease enter the query file path:\nPath: ")
+
+            while not path.exists(query_file_path):
+                print("\nFile doesn't exist, try again!\n")
+                query_file_path = input("\nPlease enter the query file path:\nPath: ")
+
+            output_file_path = input("\nWhere do you want to save the results?\nPath: ")
+
+            r.read_queries_from_file(query_file_path, output_file_path)
+
+        q = input("\n\n\nDo you want to perform another search? [Y]/[N]\n")
+
+        while q.lower() not in ['y', 'n']:
+            print("\nNot a valid option, try again!\n")
+            q = input("\nDo you want to perform another search? [Y]/[N]\n")
+
+        if q.lower() == 'y':
+            loop = True
+        elif q.lower() == 'n':
+            print("*" * 100)
+            print("\t\t\tThank you for searching with me! Goodbye =)")
+            print("*" * 100)
+            loop = False
