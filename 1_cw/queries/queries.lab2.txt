@@ -1,0 +1,9 @@
+1 Scotland
+2 Window
+3 replacing
+4 condemning
+5 income OR taxes
+6 income AND NOT taxes
+7 "income taxes"
+8 #10(income, taxes)
+9 "middle east" AND peace

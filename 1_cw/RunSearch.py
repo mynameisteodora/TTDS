@@ -2,6 +2,7 @@ from InvertedIndex import InvertedIndex
 from Term import Term
 import re
 from stemming.porter2 import stem
+import operator
 
 
 class RunSearch:
@@ -32,14 +33,12 @@ class RunSearch:
 
         return word
 
-
     # now we process the query
     # when we encounter a phrase, we do a phrase search
     # here we receive an unprocessed phrase
     # do we only assume we have two words too?
     def process_phrase_query(self, phrase, prox=1, negated=False):
-
-        words = phrase.split()
+        words = re.sub(r"[^\w\s]|_", " ", phrase).split()
 
         if len(words) == 1:
             return self.process_word_query(phrase, negated)
@@ -52,8 +51,6 @@ class RunSearch:
 
         stop_search = False
 
-        # iterable_keys_word1 = iter(inverted_index_rlv[words[0]].keys())
-        # iterable_keys_word2 = iter(inverted_index_rlv[words[1]].keys())
         iterable_keys_word1 = iter(self.inverted_index.get_word_document_keys(words[0]))
         iterable_keys_word2 = iter(self.inverted_index.get_word_document_keys(words[1]))
 
@@ -75,7 +72,6 @@ class RunSearch:
             word2 = words[1]
 
             if next_doc_word1 == next_doc_word2:
-                # print("Found occurrence in the same document = " + str(next_doc_word1))
                 # compare all the positions in these files
                 # and see if you find two that are next to each other
                 # these should be lists
@@ -86,7 +82,7 @@ class RunSearch:
                 l = 0
 
                 while k < len(curr_doc_positions_word1) and l < len(curr_doc_positions_word2):
-                    # print("k = {0}, l = {1}".format(k,l))
+
                     if curr_doc_positions_word1[k] < curr_doc_positions_word2[l]:
                         if abs(curr_doc_positions_word1[k] - curr_doc_positions_word2[l]) <= prox:
                             # we have found a phrase!
@@ -136,7 +132,7 @@ class RunSearch:
                     stop_search = True
 
         if negated == False:
-            return document_list
+            return list(zip(document_list, [1] * len(document_list)))
         else:
             return self.process_not_query(document_list)
 
@@ -146,7 +142,7 @@ class RunSearch:
         relevant_docs = self.inverted_index.get_word_documents(word)
 
         if negated == False:
-            return relevant_docs
+            return list(zip(relevant_docs, [1] * len(relevant_docs)))
         else:
             return self.process_not_query(relevant_docs)
 
@@ -157,11 +153,11 @@ class RunSearch:
 
         relevant_docs = self.inverted_index.all_documents.difference(list_of_docs)
 
-        return sorted(list(relevant_docs))
+        return list(zip(sorted(list(relevant_docs)), [1] * len(list(relevant_docs))))
 
     def process_boolean_query(self, term1, operator, term2):
-
         negated = False
+
         # term1 and term2 can be phrases or proximity searches too
 
         # check term1
@@ -203,7 +199,30 @@ class RunSearch:
             # operator is 'OR' so we return the union
             relevant_documents = set(documents_term1).union(set(documents_term2))
 
-        return sorted(list(relevant_documents))
+        ret_list = sorted(list(relevant_documents))
+
+        return ret_list
+
+    def process_ranked_query(self, query):
+        words = query.split()
+
+        for i in range(len(words)):
+            words[i] = self.preprocess_word(words[i])
+
+        scores = dict()
+
+        for word in words:
+            # fetch postings list for each term
+            for document_number in self.inverted_index.get_word_documents(word):
+
+                if document_number in scores.keys():
+                    scores[document_number] += self.inverted_index.tfidf_weight_word_document(word, document_number)
+                else:
+                    scores[document_number] = self.inverted_index.tfidf_weight_word_document(word, document_number)
+
+        sorted_scores = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
+
+        return sorted_scores
 
     def get_proxomity_query_elements(self, query):
         # get the proximity number
@@ -216,6 +235,9 @@ class RunSearch:
         q = query[open_par_sign_idx + 1:close_par_sign_idx]
 
         return q, proximity_number
+
+    def read_ranked_query(self, query):
+        return self.process_ranked_query(query)
 
     # Finally, we build a reader that decides what to do with the queries
     def read_query(self, query):
@@ -256,26 +278,64 @@ class RunSearch:
                 return self.process_phrase_query(query, proximity_number, negated)
 
             else:
-                return self.process_word_query(original_term)
+
+                # this can either be a word query
+                words = original_term.split()
+
+                if len(words) == 1:
+                    return self.process_word_query(original_term)
+
+                else:
+                    # this is a free word search
+                    return self.process_ranked_query(original_term)
 
     def read_queries_from_file(self, query_file):
         with open(query_file, 'r') as f:
             queries = f.read().splitlines()
         f.close()
 
-        for line in queries:
-            query = line[4:]
+        with open('./results.ranked.new.txt', 'w+') as f:
+            for line in queries:
+                if line[1] != ' ':
+                    # two-number query
+                    query_number = line[0:2]
+                    query = line[3:]
+                else:
+                    query_number = line[0]
+                    query = line[2:]
 
-            print(line[:4])
-            print(self.read_query(query))
+                # query result should return
+                # list of (docNo, score)
+                # if query was anything but ranked, score = 1
+                query_results = self.read_query(query)
+                i = 0
+                for result in query_results:
+                    if i < 1000:
+                        if isinstance(result[1], int):
+                            f.write("{0} 0 {1} 0 {2} 0\n".format(query_number, result[0], result[1]))
+                        else:
+                            r = str("{:0.4f}".format(result[1]))
+                            f.write("{0} 0 {1} 0 {2} 0\n".format(query_number, result[0], r))
+                        i+=1
+                    else:
+                        break
+
+        f.close()
+
 
 if __name__ == '__main__':
-    r = RunSearch('./collections/trec.sample.xml')
+    r = RunSearch('./collections/trec.5000.xml')
     # print(r.inverted_index)
     # r.inverted_index.print_to_file('./index.txt')
     # print(r.all_documents)
-    print(r.read_query('#10(income tax)'))
-    print(r.read_queries_from_file('./queries.lab2.txt'))
+    # print(r.read_query('#10(income tax)'))
+    # print(r.read_queries_from_file('./queries/queries.lab2.txt'))
 
-    print("The special query:")
-    print(r.read_query('NOT "middle east" AND NOT #10(income, taxes)'))
+    # print("The special query:")
+    # print(r.read_query('NOT "middle east" AND NOT #10(income, taxes)'))
+    #
+    # print("Free text query:")
+    # print(r.read_query('income tax reduction'))
+    #r.inverted_index.print_to_file('./inv_index_lab.txt')
+
+    print(r.read_queries_from_file('./queries/queries.ranked.txt'))

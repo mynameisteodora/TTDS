@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ElementTree
 from Term import Term
 import re
 from stemming.porter2 import stem
+import math
 
 
 class InvertedIndex:
@@ -105,6 +106,14 @@ class InvertedIndex:
                     if elem.tag.lower() == 'docno':
                         document_number = int(elem.text.strip())
 
+
+                    elif elem.tag.lower() == 'headline':
+                        headline = elem.text.strip()
+
+                        # preprocess the headline
+                        preprocessed_headline = self.preprocess(headline, document_number)
+                        word_list.extend(preprocessed_headline)
+
                     elif elem.tag.lower() == 'text':
                         text = elem.text.strip()
 
@@ -114,13 +123,6 @@ class InvertedIndex:
                         # positions counted after stopword removal
                         preprocessed_text = self.preprocess(text, document_number)
                         word_list.extend(preprocessed_text)
-
-                    elif elem.tag.lower() == 'headline':
-                        headline = elem.text.strip()
-
-                        # preprocess the headline
-                        preprocessed_headline = self.preprocess(headline, document_number)
-                        word_list.extend(preprocessed_headline)
 
         # sort the word list by word
         # then by document number
@@ -140,7 +142,7 @@ class InvertedIndex:
                 # we update the number of occurrences
                 # and the postings list
                 term = self.index[word]
-                term.add_appearance()
+                #term.add_appearance()
                 term.add_posting(document_number, position)
 
             else:
@@ -220,3 +222,12 @@ class InvertedIndex:
 
         return -1
 
+    def tfidf_weight_word_document(self, word, document_number):
+        if word in self.index.keys():
+            if document_number in self.index[word].postings.keys():
+                ans = (1 + math.log10(self.get_word_tf(word, document_number))) \
+                      * math.log10(self.number_of_documents / self.get_word_df(word))
+
+                return ans
+        else:
+            return -1

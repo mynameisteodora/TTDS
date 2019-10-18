@@ -15,6 +15,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
   <component name="ProjectId" id="1SLWhVfVCgViQZv4XaS1GtxPqZU" />
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -78,7 +81,7 @@
       <option name="presentableId" value="Default" />
       <updated>1571343476220</updated>
       <workItem from="1571343478814" duration="2282000" />
-      <workItem from="1571352148708" duration="10388000" />
+      <workItem from="1571352148708" duration="24885000" />
     </task>
     <servers />
   </component>
@@ -86,6 +89,6 @@
     <option name="version" value="1" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/1_cw$RunSearch.coverage" NAME="RunSearch Coverage Results" MODIFIED="1571395767083" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/1_cw$RunSearch.coverage" NAME="RunSearch Coverage Results" MODIFIED="1571416707789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

@@ -9,7 +9,7 @@ class Term:
     in and the positions in each of those documents.
     """
 
-    def __init__(self, word, document_frequency=1):
+    def __init__(self, word, document_frequency=0):
         """
         postings: dictionary
         key = document_number
@@ -50,3 +50,4 @@ class Term:
         else:
             self.postings[document_number] = [position]
             self.term_frequency[document_number] = 1
+            self.add_appearance()
