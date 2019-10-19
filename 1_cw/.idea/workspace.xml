@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="14aec35b-eb2a-44a4-8951-a55d6fe967ea" name="Default Changelist" comment="" />
+    <list default="true" id="14aec35b-eb2a-44a4-8951-a55d6fe967ea" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/inverted_index_pickle.p" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/queries/res.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InvertedIndex.py" beforeDir="false" afterPath="$PROJECT_DIR$/InvertedIndex.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pls.txt" beforeDir="false" afterPath="$PROJECT_DIR$/pls.txt" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +92,7 @@
       <updated>1571343476220</updated>
       <workItem from="1571343478814" duration="2282000" />
       <workItem from="1571352148708" duration="24885000" />
-      <workItem from="1571420498017" duration="7837000" />
+      <workItem from="1571420498017" duration="8594000" />
     </task>
     <servers />
   </component>
@@ -108,6 +114,6 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/1_cw$RunSearch.coverage" NAME="RunSearch Coverage Results" MODIFIED="1571493196638" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/1_cw$RunSearch.coverage" NAME="RunSearch Coverage Results" MODIFIED="1571514490896" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
