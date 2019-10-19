@@ -3,7 +3,7 @@ from Term import Term
 import re
 from stemming.porter2 import stem
 import math
-
+import pickle
 
 class InvertedIndex:
     """A class for building and holding an inverted index.
@@ -157,6 +157,8 @@ class InvertedIndex:
         #     print("Num appearances = " + str(term.document_frequency))
         #     print("\t" + str(term.postings))
 
+        pickle.dump(self, open("index.p", "wb"))
+
         return self.index
 
     def print_to_file(self, output_file):
@@ -165,7 +167,7 @@ class InvertedIndex:
 
             for word in self.index.keys():
                 term = self.index[word]
-                f.write("{0} :({1}) \n".format(word, term.document_frequency))
+                f.write("{0}:({1}) \n".format(word, term.document_frequency))
                 for document_number in term.postings.keys():
                     f.write("\t {0}:({1}) {2} \n".format(document_number, term.term_frequency[document_number],
                                                          ", ".join(str(i) for i in term.postings[document_number])))

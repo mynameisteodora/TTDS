@@ -1,17 +1,24 @@
-import sys
-
 from InvertedIndex import InvertedIndex
 import re
 from stemming.porter2 import stem
 import operator
 from os import path
+import pickle
 
 
 class RunSearch:
 
-    def __init__(self, collection):
+    def __init__(self):
+        self.inverted_index = None
+        self.stopword_file = None
+
+    def create_new_index(self, collection):
         self.inverted_index = InvertedIndex(collection)
         self.stopword_file = self.inverted_index.stopword_file
+
+    def load_index_from_file(self, pickle_dump):
+        self.inverted_index = pickle.load( open(pickle_dump, "rb"))
+        self.stopword_file = './englishST.txt'
 
     def preprocess_word(self, word):
 
@@ -333,18 +340,41 @@ if __name__ == '__main__':
 
     print("\nYou can read the README file to learn how to use me.")
 
-    collection_path = input("\nPlease enter the path to the collection you want to use to build the index\nPath: ")
+    r = RunSearch()
 
-    while not path.exists(collection_path):
-        print("\nFile doesn't exist, try again!\n")
+    load_or_create = input("Would you like to load an existing index [L], create a new index from a collection ["
+                           "C] or load the default index[D]?\n[L]/[C]/[D]: ")
+
+    while load_or_create.lower() not in ['c', 'l', 'd']:
+        print("\nNot a valid option, try again!\n")
+        load_or_create = input("Would you like to load an existing index [L], create a new index from a collection ["
+                           "C] or load the default index[D]?\n[L]/[C]/[D]: ")
+
+    if load_or_create.lower() == 'c':
         collection_path = input("\nPlease enter the path to the collection you want to use to build the index\nPath: ")
 
-    index_print_output_path = input("\nWhere do you want to save your index?\nPath: ")
+        while not path.exists(collection_path):
+            print("\nFile doesn't exist, try again!\n")
+            collection_path = input("\nPlease enter the path to the collection you want to use to build the "
+                                    "index\nPath: ")
 
-    print("\nCalculating index...")
-    r = RunSearch(collection_path)
-    r.inverted_index.print_to_file(index_print_output_path)
-    print("Inverted index completed! You can find it here: {0}".format(collection_path))
+        index_print_output_path = input("\nWhere do you want to save your index?\nPath: ")
+
+        print("\nCalculating index...")
+        r.create_new_index(collection_path)
+        r.inverted_index.print_to_file(index_print_output_path)
+        print("Inverted index completed! You can find it here: {0}".format(index_print_output_path))
+    elif load_or_create.lower() == 'l':
+        import_path = input("\nPlease enter the path to the stored index\nPath: ")
+
+        while not path.exists(import_path):
+            print("\nFile doesn't exist, try again!\n")
+            import_path = input("\nPlease enter the path to the stored index (pickle format)\nPath: ")
+
+        r.load_index_from_file(import_path)
+        print("Index loaded!")
+    elif load_or_create.lower() == 'd':
+        r.load_index_from_file('./inverted_index_pickle.p')
 
     loop = True
     while loop:
