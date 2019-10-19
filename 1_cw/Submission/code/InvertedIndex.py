@@ -142,20 +142,12 @@ class InvertedIndex:
                 # we update the number of occurrences
                 # and the postings list
                 term = self.index[word]
-                #term.add_appearance()
                 term.add_posting(document_number, position)
 
             else:
                 # print("Word not in index!")
                 new_term.add_posting(document_number, position)
                 self.index[word] = new_term
-
-        # print inverted index
-        # for word in self.index.keys():
-        #     print(word)
-        #     term = self.index[word]
-        #     print("Num appearances = " + str(term.document_frequency))
-        #     print("\t" + str(term.postings))
 
         pickle.dump(self, open("index.p", "wb"))
 

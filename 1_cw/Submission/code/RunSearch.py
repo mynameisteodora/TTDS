@@ -7,6 +7,7 @@ import pickle
 
 
 class RunSearch:
+    """A class for parsing queries and returning appropriate results"""
 
     def __init__(self):
         self.inverted_index = None
