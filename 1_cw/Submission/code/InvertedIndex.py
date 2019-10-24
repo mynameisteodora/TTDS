@@ -5,6 +5,7 @@ from stemming.porter2 import stem
 import math
 import pickle
 
+
 class InvertedIndex:
     """A class for building and holding an inverted index.
 
@@ -15,6 +16,8 @@ class InvertedIndex:
     The positions of the word are counted after stopword removal.
     Tokenising is made with the use of regular expressions and hyphens are treated as separators.
     """
+
+    all_documents = None
 
     def __init__(self, input_file, stopword_file='./englishST.txt'):
         """
@@ -149,8 +152,6 @@ class InvertedIndex:
                 new_term.add_posting(document_number, position)
                 self.index[word] = new_term
 
-        pickle.dump(self, open("index.p", "wb"))
-
         return self.index
 
     def print_to_file(self, output_file):
@@ -225,3 +226,7 @@ class InvertedIndex:
                 return ans
         else:
             return -1
+
+
+def pickle_index(inv_index):
+    pickle.dump(inv_index, open("inverted_index_pickle.p", "wb"))

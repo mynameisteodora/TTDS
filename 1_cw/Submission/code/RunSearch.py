@@ -1,4 +1,5 @@
 from InvertedIndex import InvertedIndex
+from InvertedIndex import pickle_index
 import re
 from stemming.porter2 import stem
 import operator
@@ -15,6 +16,7 @@ class RunSearch:
 
     def create_new_index(self, collection):
         self.inverted_index = InvertedIndex(collection)
+        pickle_index(self.inverted_index)
         self.stopword_file = self.inverted_index.stopword_file
 
     def load_index_from_file(self, pickle_dump):
