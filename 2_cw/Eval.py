@@ -1,6 +1,7 @@
 import re
 import os
 import math
+from scipy import stats
 
 class Eval:
 
@@ -116,7 +117,6 @@ class Eval:
         else:
             return max(list(self.sys_results[system].keys()))
 
-
     def get_top_k_results_for_query(self, system, q_num, k):
         return self.get_result_for_query(system, q_num)[:k]
 
@@ -130,7 +130,7 @@ class Eval:
         else:
             precisions = {}
 
-            for q_num in range(1, self.get_num_queries_for_system(system)+1):
+            for q_num in range(1, self.get_num_queries_for_system(system) + 1):
                 top_k_results = self.get_top_k_results_for_query(system, q_num, k)
 
                 rel_docs_found = 0
@@ -163,7 +163,8 @@ class Eval:
                         rel_docs_found += 1
 
                 # TODO keep only 3 decimal points
-                recalls[q_num] = float("%0.3f" % (rel_docs_found / len(self.get_relevant_docs_for_query_no_score(q_num))))
+                recalls[q_num] = float(
+                    "%0.3f" % (rel_docs_found / len(self.get_relevant_docs_for_query_no_score(q_num))))
 
             return recalls
 
@@ -197,12 +198,12 @@ class Eval:
 
         else:
             r = len(self.get_relevant_docs_for_query_no_score(q_num))
-            n = len(self.sys_results[system])
+            n = len(self.sys_results[system][q_num])
 
             ap_sum = 0
-            for k in range(1, n+1):
+            for k in range(1, n + 1):
                 prec = self.precision_at_k(system, k)
-                if self.sys_results[system][q_num][k][0] in self.get_relevant_docs_for_query_no_score(q_num):
+                if self.sys_results[system][q_num][k - 1][0] in self.get_relevant_docs_for_query_no_score(q_num):
                     ap_sum += prec[q_num]
 
             return float("%0.3f" % ((ap_sum / r) * 1.0))
@@ -216,7 +217,7 @@ class Eval:
             Q = len(self.relevant_docs.keys())
             map_sum = 0
 
-            for q_num in range(1, Q+1):
+            for q_num in range(1, Q + 1):
                 map_sum += self.AP(system, q_num)
 
         return (map_sum / Q) * 1.0
@@ -237,12 +238,12 @@ class Eval:
     # - nDCG@10: normalized discount cumulative gain at cutoff 10.
     def DCG_k(self, system, q_num, k):
         first_doc = self.sys_results[system][q_num][0][0]
-        #print("rel docs for query = {0}".format(self.get_relevant_docs_for_query(q_num)))
+        # print("rel docs for query = {0}".format(self.get_relevant_docs_for_query(q_num)))
         rel_1 = self.get_doc_score_for_query(q_num, first_doc)
 
         dcg_sum = 0
-        for i in range(2, k):
-            doc_at_i = self.sys_results[system][q_num][i-1][0]
+        for i in range(2, k + 1):
+            doc_at_i = self.sys_results[system][q_num][i - 1][0]
             rel_i = self.get_doc_score_for_query(q_num, doc_at_i)
             dcg_sum += (rel_i / math.log2(i))
 
@@ -252,29 +253,27 @@ class Eval:
         if k > len(self.get_relevant_docs_for_query_no_score(q_num)):
             return 0
         else:
-            return self.get_relevant_docs_for_query(q_num)[k-1][1]
+            return self.get_relevant_docs_for_query(q_num)[k - 1][1]
 
     def ideal_DCG_k(self, q_num, k):
         first_doc = self.get_relevant_docs_for_query(q_num)[0][0]
         rel_1 = self.get_doc_score_for_query(q_num, first_doc)
 
         idcg_sum = 0
-        for i in range(2, k):
+        for i in range(2, k + 1):
             if i > len(self.get_relevant_docs_for_query(q_num)):
                 rel_i = 0
             else:
-                rel_i = self.get_relevant_docs_for_query(q_num)[i-1][1]
+                rel_i = self.get_relevant_docs_for_query(q_num)[i - 1][1]
             idcg_sum += rel_i / math.log2(i)
 
-        return float("%0.3f" % (rel_1+idcg_sum))
+        return float("%0.3f" % (rel_1 + idcg_sum))
 
     def n_DCG_k(self, system, q_num, k):
         dcg_k = self.DCG_k(system, q_num, k)
         i_dcg_k = self.ideal_DCG_k(q_num, k)
-        #print("ideal dcg at {0} = {1}".format(k, i_dcg_k))
+        # print("ideal dcg at {0} = {1}".format(k, i_dcg_k))
         return float("%0.3f" % (dcg_k / i_dcg_k))
-
-
 
 
 if __name__ == '__main__':
@@ -296,9 +295,11 @@ if __name__ == '__main__':
     #
     # print("nDCG:")
     # print(eval.n_DCG_k('S1', 1, 4))
-
+    g = open('./All.eval', 'w')
+    g.write('\tP@10\tR@50\tr-Precision\tAP\tnDCG@10\tnDCG@20\n')
+    measure_means = {'p10': [], 'r50': [], 'rprec': [], 'ap': [], 'ndcg10': [], 'ndgc20': []}
     for system in ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']:
-        with open('./{0}.results'.format(system), 'w') as f:
+        with open('./{0}.eval'.format(system), 'w') as f:
             print("-" * 80)
             print("Evaluating system {0}".format(system))
             print("-" * 80)
@@ -308,8 +309,9 @@ if __name__ == '__main__':
             r_prec = eval.r_precision(system)
 
             f.write('\tP@10\tR@50\tr-Precision\tAP\tnDCG@10\tnDCG@20\n')
+            means = [0] * 6
 
-            for q_num in range(1,11):
+            for q_num in range(1, 11):
                 ap = eval.AP(system, q_num)
                 ndcg10 = eval.n_DCG_k(system, q_num, 10)
                 ndcg20 = eval.n_DCG_k(system, q_num, 20)
@@ -325,4 +327,43 @@ if __name__ == '__main__':
                 print("nDCG@10 = {0}".format(ndcg10))
                 print("nDCG@50 = {0}".format(ndcg20))
 
-                f.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n'.format(q_num, p10[q_num], r50[q_num], r_prec[q_num], ap, ndcg10, ndcg20))
+                f.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n'.format(q_num, p10[q_num], r50[q_num], r_prec[q_num], ap,
+                                                                     ndcg10, ndcg20))
+                means[0] += p10[q_num]
+                means[1] += r50[q_num]
+                means[2] += r_prec[q_num]
+                means[3] += ap
+                means[4] += ndcg10
+                means[5] += ndcg20
+
+            f.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t'.format('mean', "%0.3f" % (means[0] / 10), "%0.3f" % (means[1] / 10),
+                                                         "%0.3f" % (means[2] / 10), "%0.3f" % (means[3] / 10),
+                                                         "%0.3f" % (means[4] / 10), "%0.3f" % (means[5] / 10)))
+
+            g.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n'.format(system, "%0.3f" % (means[0] / 10), "%0.3f" % (means[1] / 10),
+                                                         "%0.3f" % (means[2] / 10), "%0.3f" % (means[3] / 10),
+                                                         "%0.3f" % (means[4] / 10), "%0.3f" % (means[5] / 10)))
+
+            measure_means['p10'].append(means[0] / 10)
+            measure_means['r50'].append(means[1] / 10)
+            measure_means['rprec'].append(means[2] / 10)
+            measure_means['ap'].append(means[3] / 10)
+            measure_means['ndcg10'].append(means[4] / 10)
+            measure_means['ndgc20'].append(means[5] / 10)
+
+    for k in measure_means.keys():
+        curr_measure = measure_means[k]
+        max_1 = 0
+        idx_1 = 0
+        max_2 = 0
+        for i in range(len(curr_measure)):
+            if curr_measure[i] > max_1:
+                max_2 = max_1
+                idx_2 = idx_1
+                max_1 = curr_measure[i]
+                idx_1 = i
+
+        print("For measure {0}, the top two scores are: 1. {1}, 2.{2}".format(k, max_1, max_2))
+
+
+
